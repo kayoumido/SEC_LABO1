@@ -2,35 +2,39 @@ use lazy_static::lazy_static;
 use read_input::prelude::*;
 use regex::Regex;
 
-#[path = "player_command.rs"]
-mod player_command;
+#[path = "command.rs"]
+mod command;
 
 use std::str::FromStr;
 use termcolor::Color;
 
-use player_command::{CmdOrigin, PlayerCmd};
+use command::{CmdOrigin, PlayerCmd};
 
 pub fn ask_for_player_colour() -> Color {
+    fn clean_input(input: &String) -> String {
+        input.replace(&['(', ')', '[', ']', ' '][..], "")
+    }
+
     loop {
         lazy_static! {
-            static ref re: Regex =
-                Regex::new(r"([A-Za-z]+)|\((\d{1,3}), (\d{1,3}), (\d{1,3})\)?").unwrap();
+            static ref RE: Regex = Regex::new(r"(^[A-Za-z]+$)|^\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)$|^\[(\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\]$|^(\d{1,3}), ?(\d{1,3}), ?(\d{1,3})$").unwrap();
         };
 
         let input_colour: String = input()
             .repeat_msg("What colour would you like? ")
             .add_err_test(
-                |x: &String| re.is_match(&x),
+                |x: &String| RE.is_match(&x),
                 "Please enter a colour or a rgb code.",
             )
             .get();
 
-        if let Err(_) = Color::from_str(&input_colour) {
-            println!("Unknown colour, please try again.");
+        let cleaned_input = clean_input(&input_colour);
+        if let Err(e) = Color::from_str(&cleaned_input) {
+            println!("{}, please try again.", e);
             continue;
         }
 
-        return Color::from_str(&input_colour).unwrap();
+        return Color::from_str(&cleaned_input).unwrap();
     }
 }
 
