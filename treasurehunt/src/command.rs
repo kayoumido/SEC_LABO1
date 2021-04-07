@@ -33,7 +33,7 @@ impl PlayerCmd {
             if s.starts_with("0x") {
                 u8::from_str_radix(&s[2..], 16).ok()
             } else {
-                u8::from_str_radix(s, 10).ok()
+                u8::from_str_radix(&s, 10).ok()
             }
         }
 
@@ -91,8 +91,6 @@ impl PlayerCmd {
         }
     }
 }
-
-/// An error from parsing an invalid color specification.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct ParseCmdError {
     kind: ParseCmdErrorKind,
@@ -140,5 +138,105 @@ impl fmt::Display for ParseCmdError {
                 self.given
             ),
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::{CmdOrigin, ParseCmdError, ParseCmdErrorKind, PlayerCmd};
+
+    #[test]
+    fn test_cmd_from_string_ok() {
+        let menu_cmd = PlayerCmd::from_str("Start", &CmdOrigin::Menu);
+        let game_cmd = PlayerCmd::from_str("Move", &CmdOrigin::Game);
+
+        assert_eq!(menu_cmd, Ok(PlayerCmd::Start));
+        assert_eq!(game_cmd, Ok(PlayerCmd::Move));
+    }
+
+    #[test]
+    fn test_from_decimal_ok() {
+        let menu_cmd = PlayerCmd::from_str("2", &CmdOrigin::Menu);
+        let game_cmd = PlayerCmd::from_str("2", &CmdOrigin::Game);
+
+        assert_eq!(menu_cmd, Ok(PlayerCmd::Info));
+        assert_eq!(game_cmd, Ok(PlayerCmd::Search));
+    }
+
+    #[test]
+    fn test_from_hex_ok() {
+        let menu_cmd = PlayerCmd::from_str("0x2", &CmdOrigin::Menu);
+        let game_cmd = PlayerCmd::from_str("0x2", &CmdOrigin::Game);
+
+        assert_eq!(menu_cmd, Ok(PlayerCmd::Info));
+        assert_eq!(game_cmd, Ok(PlayerCmd::Search));
+    }
+
+    #[test]
+    fn test_unknown_cmd_from_string_error() {
+        let menu_cmd = PlayerCmd::from_str("unknown", &CmdOrigin::Menu);
+        let game_cmd = PlayerCmd::from_str("unknown", &CmdOrigin::Game);
+
+        let expected = Err(ParseCmdError {
+            kind: ParseCmdErrorKind::InvalidCmd,
+            given: "unknown".to_string(),
+        });
+
+        assert_eq!(menu_cmd, expected);
+        assert_eq!(game_cmd, expected);
+    }
+
+    #[test]
+    fn test_unknown_cmd_from_decimal_error() {
+        let menu_cmd = PlayerCmd::from_str("45", &CmdOrigin::Menu);
+        let game_cmd = PlayerCmd::from_str("45", &CmdOrigin::Game);
+
+        let expected = Err(ParseCmdError {
+            kind: ParseCmdErrorKind::InvalidCmdNumber,
+            given: "45".to_string(),
+        });
+
+        assert_eq!(menu_cmd, expected);
+        assert_eq!(game_cmd, expected);
+    }
+
+    #[test]
+    fn test_unknown_cmd_from_hex_error() {
+        let menu_cmd = PlayerCmd::from_str("0xFF", &CmdOrigin::Menu);
+        let game_cmd = PlayerCmd::from_str("0xFF", &CmdOrigin::Game);
+
+        let expected = Err(ParseCmdError {
+            kind: ParseCmdErrorKind::InvalidCmdNumber,
+            given: "255".to_string(),
+        });
+
+        assert_eq!(menu_cmd, expected);
+        assert_eq!(game_cmd, expected);
+    }
+
+    #[test]
+    fn test_game_command_string_as_menu_cmd_error() {
+        let cmd = PlayerCmd::from_str("Move", &CmdOrigin::Menu);
+
+        assert_eq!(
+            cmd,
+            Err(ParseCmdError {
+                kind: ParseCmdErrorKind::InvalidCmd,
+                given: "Move".to_string(),
+            })
+        );
+    }
+
+    #[test]
+    fn test_menu_command_string_as_game_cmd_error() {
+        let cmd = PlayerCmd::from_str("Start", &CmdOrigin::Game);
+
+        assert_eq!(
+            cmd,
+            Err(ParseCmdError {
+                kind: ParseCmdErrorKind::InvalidCmd,
+                given: "Start".to_string(),
+            })
+        );
     }
 }
