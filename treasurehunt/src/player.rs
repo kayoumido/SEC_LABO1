@@ -7,8 +7,8 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn new(position: (u8, u8), colour: Color) -> Player {
-        Player { position, colour }
+    pub fn new(position: (u8, u8), colour: Color) -> Self {
+        Self { position, colour }
     }
 
     pub fn set_position(&mut self, new_pos: (u8, u8)) {
