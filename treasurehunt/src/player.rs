@@ -15,6 +15,10 @@ impl Player {
         self.position = new_pos;
     }
 
+    pub fn get_position(self) -> (u8, u8) {
+        self.position
+    }
+
     pub fn get_colour(&self) -> Color {
         self.colour
     }
