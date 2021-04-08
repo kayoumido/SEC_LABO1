@@ -1,6 +1,6 @@
 use termcolor::Color;
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Player {
     position: (u8, u8),
     colour: Color,

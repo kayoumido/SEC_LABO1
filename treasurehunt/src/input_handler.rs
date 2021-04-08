@@ -3,18 +3,23 @@ use read_input::prelude::*;
 use regex::Regex;
 
 #[path = "command.rs"]
-mod command;
+pub mod command;
 
-use std::str::FromStr;
-use termcolor::Color;
+#[path = "utils.rs"]
+pub mod utils;
 
 use command::{CmdOrigin, PlayerCmd};
+use std::ops::Range;
+use std::str::FromStr;
+
+use termcolor::Color;
+use utils::parse_number;
+
+fn clean_input(input: &String) -> String {
+    input.replace(&['(', ')', '[', ']', ' '][..], "")
+}
 
 pub fn ask_for_player_colour() -> Color {
-    fn clean_input(input: &String) -> String {
-        input.replace(&['(', ')', '[', ']', ' '][..], "")
-    }
-
     loop {
         lazy_static! {
             static ref RE: Regex = Regex::new(r"(^[A-Za-z]+$)|^\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)$|^\[(\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\]$|^(\d{1,3}), ?(\d{1,3}), ?(\d{1,3})$").unwrap();
@@ -71,5 +76,48 @@ fn ask_for_player_command(origin: CmdOrigin, msg: &str, err_msg: &str) -> Player
         }
 
         return PlayerCmd::from_str(&input_cmd, &origin).unwrap();
+    }
+}
+
+pub fn ask_for_coordinates(x_boundries: Range<u8>, y_boundries: Range<u8>) -> (u8, u8) {
+    loop {
+        lazy_static! {
+            static ref RE: Regex = Regex::new(r"^\((\d+,\s*)+\d+\)$|^\[(\d+,\s*)+\d+\]$").unwrap();
+        };
+
+        let input_coord: String = input()
+            .repeat_msg("Where do you want to go? ")
+            .add_err_test(
+                |x: &String| RE.is_match(&x),
+                "Bad format, please respect the format (i.e. (x, y) or [x, y])",
+            )
+            .get();
+
+        let clean_coord = clean_input(&input_coord.to_string());
+        let coords: Vec<&str> = clean_coord.split(',').collect();
+
+        if coords.len() != 2 {
+            println!(
+                "Bad number of dimension in provided coordinate. Provided {}, 2 expected",
+                coords.len()
+            );
+            continue;
+        }
+
+        let x = parse_number(coords[0]);
+        let y = parse_number(coords[1]);
+
+        if (x == None || y == None)
+            || !x_boundries.contains(&x.unwrap())
+            || !y_boundries.contains(&y.unwrap())
+        {
+            println!(
+                "Out of bounds, given coordinates are out of the map ({}x{})",
+                x_boundries.end, y_boundries.end
+            );
+            continue;
+        }
+
+        return (x.unwrap(), y.unwrap());
     }
 }

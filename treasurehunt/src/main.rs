@@ -4,45 +4,111 @@
 #[path = "map.rs"]
 mod map;
 
-use std::str::FromStr;
+#[path = "utils.rs"]
+mod utils;
 
-use lazy_static::lazy_static;
-use read_input::prelude::*;
-use regex::Regex;
-use termcolor::Color;
+#[path = "player.rs"]
+mod player;
 
+#[path = "command.rs"]
+mod command;
+
+#[path = "input_handler.rs"]
+mod input_handler;
+
+use command::PlayerCmd;
 use map::Map;
 
 fn main() {
-    // let map = Map::new();
+    // Print welcome message
+    // Print main menu
+    // Ask user for input
+    // 1. Start game
+    // 2. Print About
+    // 3. Quit
+    //
+    // Start game
+    // Ask for player colour
+    // init map
 
-    // let colour = Color::from_str("blfue");
+    let colour = input_handler::ask_for_player_colour();
+    let mut map = Map::new(map::player::Player::new((0, 0), colour));
 
-    let colour: Color;
-    loop {
-        lazy_static! {
-            static ref re: Regex =
-                Regex::new(r"([A-Za-z]+)|\((\d{1,3}), (\d{1,3}), (\d{1,3})\)?").unwrap();
-        };
-
-        let input_colour: String = input()
-            .repeat_msg("What colour would you like? ")
-            .add_err_test(
-                |x: &String| re.is_match(&x),
-                "Please enter a colour or a rgb code, please try again.",
-            )
-            .get();
-
-        if let Err(err) = Color::from_str(&input_colour) {
-            println!("Unknown colour, please try again.");
-            continue;
-        }
-
-        colour = Color::from_str(&input_colour).unwrap();
-        break;
+    if let Err(_) = map.print() {
+        println!("Something bad happened");
     }
 
-    println!("{:?}", colour);
+    let mut prev_cmd: PlayerCmd;
+    loop {
+        let cmd = input_handler::ask_form_game_command();
 
-    // map.print();
+        match cmd {
+            input_handler::command::PlayerCmd::Move => loop {
+                let coordinates = input_handler::ask_for_coordinates(
+                    0..Map::DEFAULT_WIDTH,
+                    0..Map::DEFAULT_WIDTH,
+                );
+                let player_coord = map.get_player_position();
+
+                let possible_x_start: u8;
+                if player_coord.0 < 4 {
+                    possible_x_start = 0
+                } else {
+                    possible_x_start = player_coord.0 - 4;
+                }
+
+                let possible_x_end: u8;
+                if player_coord.0 > Map::DEFAULT_WIDTH - 4 {
+                    possible_x_end = Map::DEFAULT_WIDTH;
+                } else {
+                    possible_x_end = player_coord.0 + 4;
+                }
+
+                let possible_y_start: u8;
+                if player_coord.1 < 4 {
+                    possible_y_start = 0
+                } else {
+                    possible_y_start = player_coord.1 - 4;
+                }
+
+                let possible_y_end: u8;
+                if player_coord.1 > Map::DEFAULT_HEIGHT - 4 {
+                    possible_y_end = Map::DEFAULT_HEIGHT;
+                } else {
+                    possible_y_end = player_coord.1 + 4;
+                }
+
+                let possible_x_coord = possible_x_start..possible_x_end;
+                let possible_y_coord = possible_y_start..possible_y_end;
+
+                if !possible_x_coord.contains(&coordinates.0)
+                    || !possible_y_coord.contains(&coordinates.1)
+                {
+                    println!("You can only move 4 squares at a time!");
+                    continue;
+                }
+
+                map.move_player(coordinates);
+                break;
+            },
+            input_handler::command::PlayerCmd::Search => {
+                if !map.search() {
+                    println!("Dayum..your search resulted in nothing :/");
+                    println!(
+                        "Here's how far you're from the treasure: {:.3}",
+                        map.distance_to_treasure()
+                    )
+                } else {
+                    println!("Congratz! You've found the treasure");
+                }
+            }
+            input_handler::command::PlayerCmd::Quit => break,
+            // if we ever get here that means something teribly wrong happened
+            _ => break,
+        }
+
+        if let Err(_) = map.print() {
+            println!("Something bad happened");
+        }
+    }
 }

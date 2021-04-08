@@ -4,6 +4,11 @@ Note:
 The follwoing is strongly inspired by the termcolor lib Color for all the numeric str and error handeling
 */
 
+#[path = "utils.rs"]
+mod utils;
+
+use utils::parse_number;
+
 use std::error;
 use std::fmt;
 
@@ -23,20 +28,6 @@ pub enum CmdOrigin {
 
 impl PlayerCmd {
     pub fn from_str_numeric(s: &str, origin: &CmdOrigin) -> Result<Self, ParseCmdError> {
-        /// Parses a string number (decimal or hex) to a decimal u8
-        ///
-        // Note: This function comes from the termcolor lib
-        //       source: https://docs.rs/termcolor/1.1.2/src/termcolor/lib.rs.html#1850
-        fn parse_number(s: &str) -> Option<u8> {
-            use std::u8;
-
-            if s.starts_with("0x") {
-                u8::from_str_radix(&s[2..], 16).ok()
-            } else {
-                u8::from_str_radix(&s, 10).ok()
-            }
-        }
-
         if let Some(n) = parse_number(s) {
             match origin {
                 CmdOrigin::Menu => Self::parse_menu_num_cmd(n),
