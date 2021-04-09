@@ -22,7 +22,7 @@ fn clean_input(input: &String) -> String {
 pub fn ask_for_player_colour() -> Color {
     loop {
         lazy_static! {
-            static ref RE: Regex = Regex::new(r"(^[A-Za-z]+$)|^\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)$|^\[(\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\]$|^(\d{1,3}), ?(\d{1,3}), ?(\d{1,3})$").unwrap();
+            static ref RE: Regex = Regex::new(r"^[A-Za-z]+$|^\((\d{1,3},\s*){2}\d{1,3}\)$|^\[(\d{1,3},\s*){2}\d{1,3}\]$|^(\d{1,3},\s*){2}\d{1,3}$").unwrap();
         };
 
         let input_colour: String = input()
@@ -79,7 +79,7 @@ fn ask_for_player_command(origin: CmdOrigin, msg: &str, err_msg: &str) -> Player
     }
 }
 
-pub fn ask_for_coordinates(x_boundries: Range<u8>, y_boundries: Range<u8>) -> (u8, u8) {
+pub fn ask_for_coordinates() -> (Option<u8>, Option<u8>) {
     loop {
         lazy_static! {
             static ref RE: Regex = Regex::new(r"^\((\d+,\s*)+\d+\)$|^\[(\d+,\s*)+\d+\]$").unwrap();
@@ -88,7 +88,7 @@ pub fn ask_for_coordinates(x_boundries: Range<u8>, y_boundries: Range<u8>) -> (u
         let input_coord: String = input()
             .repeat_msg("Where do you want to go? ")
             .add_err_test(
-                |x: &String| RE.is_match(&x),
+                |x: &String| testing(x),
                 "Bad format, please respect the format (i.e. (x, y) or [x, y])",
             )
             .get();
@@ -104,20 +104,29 @@ pub fn ask_for_coordinates(x_boundries: Range<u8>, y_boundries: Range<u8>) -> (u
             continue;
         }
 
-        let x = parse_number(coords[0]);
-        let y = parse_number(coords[1]);
+        return (parse_number(coords[0]), parse_number(coords[1]));
+        // let x = parse_number(coords[0]);
+        // let y = parse_number(coords[1]);
 
-        if (x == None || y == None)
-            || !x_boundries.contains(&x.unwrap())
-            || !y_boundries.contains(&y.unwrap())
-        {
-            println!(
-                "Out of bounds, given coordinates are out of the map ({}x{})",
-                x_boundries.end, y_boundries.end
-            );
-            continue;
-        }
+        // if (x == None || y == None)
+        //     || !x_boundries.contains(&x.unwrap())
+        //     || !y_boundries.contains(&y.unwrap())
+        // {
+        //     println!(
+        //         "Out of bounds, given coordinates are out of the map ({}x{})",
+        //         x_boundries.end, y_boundries.end
+        //     );
+        //     continue;
+        // }
 
-        return (x.unwrap(), y.unwrap());
+        // return (x.unwrap(), y.unwrap());
     }
+}
+
+fn testing(x: &String) -> bool {
+    lazy_static! {
+        static ref RE: Regex = Regex::new(r"^\((\d+,\s*)+\d+\)$|^\[(\d+,\s*)+\d+\]$").unwrap();
+    };
+
+    RE.is_match(&x)
 }
