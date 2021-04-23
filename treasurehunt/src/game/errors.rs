@@ -34,18 +34,14 @@ impl error::Error for SemanticError {
     }
 }
 
-#[derive(Debug, strum_macros::EnumMessage)]
+#[derive(PartialEq, Debug, strum_macros::EnumMessage)]
 pub enum MapError {
-    #[strum(message = "Coordinates are out of bounds (bounds are 15x15")]
-    #[strum(
-        detailed_message = "The given commands are out of the map"
-    )]
+    #[strum(message = "Coordinates are out of bounds (bounds are 0..14)")]
+    #[strum(detailed_message = "The given commands are out of the map")]
     OutOfBoundsError,
 
     #[strum(message = "You can only move 4 squares at a time")]
-    #[strum(
-        detailed_message = "The given coordinates are too far from your original posstion"
-    )]
+    #[strum(detailed_message = "The given coordinates are too far from your original posstion")]
     InvalidMovement,
 }
 

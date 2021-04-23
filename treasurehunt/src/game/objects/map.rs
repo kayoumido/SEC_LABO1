@@ -29,8 +29,8 @@ pub struct Map {
 }
 
 impl Map {
-    pub const DEFAULT_HEIGHT: u8 = 15;
-    pub const DEFAULT_WIDTH: u8 = 15;
+    const DEFAULT_HEIGHT: usize = 15;
+    const DEFAULT_WIDTH: usize = 15;
 
     const PLAYER_CHAR: char = 'P';
     const EMPTY_CHAR: char = '.';
@@ -66,7 +66,7 @@ impl Map {
         player.set_position(player_coordinates);
 
         Self {
-            map: Self::init_map(size),
+            map: vec![vec![Self::EMPTY_CHAR; size.0]; size.1],
             player,
             treasure_position: treasure_coordinates,
         }
@@ -75,6 +75,7 @@ impl Map {
     /// Prints the `Map` to `stdout`.
     ///
     /// When the function returns, the terminal color is `White`.
+    ///
     pub fn print(&self) -> io::Result<()> {
         let bufwtr = BufferWriter::stdout(ColorChoice::Always);
         let mut buffer = bufwtr.buffer();
@@ -157,6 +158,7 @@ impl Map {
     /// # Arguments
     ///
     /// * `dest` - A tuple of u8 containing the destination coordinates
+    ///
     pub fn is_valid_movement(&self, dest: (u8, u8)) -> Result<(), MapError> {
         let src = self.player.get_position();
         // we need to add 1 because the end of the range is still a valid movement
@@ -180,6 +182,8 @@ impl Map {
             y_boundary_start = src.1 - Self::MAX_PLAYER_MOVEMENT;
         }
 
+        // now we can check if the destination is within the valid
+        // movement range around the player (i.e. 4 squares in every direction)
         if (x_boundary_start..x_boundary_end).contains(&dest.0)
             && (y_boundary_start..y_boudary_end).contains(&dest.1)
         {
@@ -211,52 +215,74 @@ impl Map {
     pub fn distance_to_treasure(&self) -> f64 {
         utils::euclidean_distance(self.player.get_position(), self.treasure_position)
     }
-
-    /// Creates a `Vec<Vec<char>` filled with `EMPTY_CHAR`
-    ///
-    /// # Arguments
-    ///
-    /// * `size` - A tuple of u8 containing the dimesions of the map
-    fn init_map(size: (u8, u8)) -> Vec<Vec<char>> {
-        vec![vec![Self::EMPTY_CHAR; size.0 as usize]; size.1 as usize]
-    }
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
+    use rstest::rstest;
 
     fn setup() -> Map {
         let player = Player::new((0, 0), Color::White);
         Map::new(player)
     }
 
-    #[test]
-    fn test_player_movement() {
+    #[rstest(
+        input,
+        expected,
+        case((Some(0),Some(0)), Ok(())),
+        case((Some(14),Some(14)), Ok(())),
+        case((Some(0),Some(14)), Ok(())),
+        case((Some(14),Some(0)), Ok(())),
+        case((Some(6),Some(9)), Ok(())),
+        case((Some(30),Some(90)), Err(MapError::OutOfBoundsError)),
+        ::trace
+    )]
+    fn test_within_boundries(input: (Option<u8>, Option<u8>), expected: Result<(), MapError>) {
+        let map = setup();
+        assert_eq!(map.within_boundries(input), expected);
+    }
+
+    #[rstest(
+        input,
+        expected,
+        case((9, 9), Ok(())),
+        case((1, 1), Ok(())),
+        case((9, 5), Ok(())),
+        case((5, 9), Ok(())),
+        case((7, 8), Ok(())),
+        case((0, 0), Err(MapError::InvalidMovement)),
+        case((15, 15), Err(MapError::InvalidMovement)),
+        ::trace
+    )]
+    fn test_is_valid_movement(input: (u8, u8), expected: Result<(), MapError>) {
         let mut map = setup();
-        let new_position: (u8, u8) = (5, 5);
+        // place player to simplify tests
+        map.move_player((5, 5));
+
+        assert_eq!(map.is_valid_movement(input), expected);
+    }
+
+    #[rstest(
+        input,
+        case((9, 9)),
+        case((0, 0)),
+        case((14, 14)),
+        case((3, 12)),
+        case((14, 1)),
+    )]
+    fn test_player_move(input: (u8, u8)) {
+        let mut map = setup();
+        map.move_player((5, 5));
         let old_position = map.player.get_position();
-        map.move_player(new_position);
+        map.move_player(input);
 
-        assert_ne!(new_position, old_position);
-        assert_eq!(map.player.get_position(), new_position);
+        assert_eq!(map.player.get_position(), input);
+        assert_ne!(map.player.get_position(), old_position);
     }
 
     #[test]
-    fn test_map_init() {
-        let size = (3, 2);
-        let expected_content = vec![Map::EMPTY_CHAR; size.0 as usize];
-        let map = Map::init_map(size);
-
-        assert!(map.contains(&expected_content));
-        assert!(map[0].contains(&Map::EMPTY_CHAR));
-
-        assert_eq!(map.len(), size.1 as usize);
-        assert_eq!(map[0].len(), size.0 as usize);
-    }
-
-    #[test]
-    fn test_treasure_searching() {
+    fn test_search() {
         let mut map = setup();
         assert!(!map.search());
 
