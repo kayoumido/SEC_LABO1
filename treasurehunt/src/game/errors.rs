@@ -33,3 +33,30 @@ impl error::Error for SemanticError {
         self.get_detailed_message().unwrap()
     }
 }
+
+#[derive(Debug, strum_macros::EnumMessage)]
+pub enum MapError {
+    #[strum(message = "Coordinates are out of bounds (bounds are 15x15")]
+    #[strum(
+        detailed_message = "The given commands are out of the map"
+    )]
+    OutOfBoundsError,
+
+    #[strum(message = "You can only move 4 squares at a time")]
+    #[strum(
+        detailed_message = "The given coordinates are too far from your original posstion"
+    )]
+    InvalidMovement,
+}
+
+impl fmt::Display for MapError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.get_message().unwrap())
+    }
+}
+
+impl error::Error for MapError {
+    fn description(&self) -> &str {
+        self.get_detailed_message().unwrap()
+    }
+}
