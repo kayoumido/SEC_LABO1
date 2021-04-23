@@ -5,7 +5,7 @@ pub fn generate_coordinates(max_x: u8, max_y: u8) -> (u8, u8) {
     (rng.gen_range(0..max_x) as u8, rng.gen_range(0..max_y) as u8)
 }
 
-pub fn eucldean_distance(p: (u8, u8), q: (u8, u8)) -> f64 {
+pub fn euclidean_distance(p: (u8, u8), q: (u8, u8)) -> f64 {
     let p = (p.0 as f64, p.1 as f64);
     let q = (q.0 as f64, q.1 as f64);
     (((q.0 - p.0).powf(2.) + (q.1 - p.1).powf(2.)) as f64).sqrt()

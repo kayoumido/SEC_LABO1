@@ -12,7 +12,7 @@ pub mod player;
 #[path = "../../utils.rs"]
 mod utils;
 
-#[path="../errors.rs"]
+#[path = "../errors.rs"]
 mod errors;
 
 use std::io::{self, Write};
@@ -34,11 +34,11 @@ impl Map {
 
     const PLAYER_CHAR: char = 'P';
     const EMPTY_CHAR: char = '.';
-    const VISITED_CHAR: char = '~';
+    pub const VISITED_CHAR: char = '~';
 
     const MAP_COLOUR: Color = Color::White;
 
-    const MAX_PLAYER_MOVEMENT: u8 = 4;
+    pub const MAX_PLAYER_MOVEMENT: u8 = 4;
 
     /// Returns a map.
     /// It will also "place" (i.e. generate coordinates) a treasure and the given `player`
@@ -180,7 +180,9 @@ impl Map {
             y_boundary_start = src.1 - Self::MAX_PLAYER_MOVEMENT;
         }
 
-        if (x_boundary_start..x_boundary_end).contains(&dest.0) && (y_boundary_start..y_boudary_end).contains(&dest.1) {
+        if (x_boundary_start..x_boundary_end).contains(&dest.0)
+            && (y_boundary_start..y_boudary_end).contains(&dest.1)
+        {
             Ok(())
         } else {
             Err(MapError::InvalidMovement)
@@ -195,7 +197,10 @@ impl Map {
     /// * `coordinate` - A tuple of u8 containing the coordiante to check
     ///
     pub fn within_boundries(&self, coordinate: (Option<u8>, Option<u8>)) -> Result<(), MapError> {
-        if (coordinate.0 != None && coordinate.1 != None) && (0..self.map[0].len()).contains(&(coordinate.0.unwrap() as usize)) && (0..self.map.len()).contains(&(coordinate.1.unwrap() as usize)) {
+        if (coordinate.0 != None && coordinate.1 != None)
+            && (0..self.map[0].len()).contains(&(coordinate.0.unwrap() as usize))
+            && (0..self.map.len()).contains(&(coordinate.1.unwrap() as usize))
+        {
             Ok(())
         } else {
             Err(MapError::OutOfBoundsError)
@@ -204,7 +209,7 @@ impl Map {
 
     /// Returns the Euclidean distance between the player and the treasure
     pub fn distance_to_treasure(&self) -> f64 {
-        utils::eucldean_distance(self.player.get_position(), self.treasure_position)
+        utils::euclidean_distance(self.player.get_position(), self.treasure_position)
     }
 
     /// Creates a `Vec<Vec<char>` filled with `EMPTY_CHAR`
