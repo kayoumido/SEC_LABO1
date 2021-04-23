@@ -1,14 +1,11 @@
 #[path = "objects/map.rs"]
 pub mod map;
 
-#[path = "../input_handler.rs"]
-mod input_handler;
-
 #[path = "input/handlers.rs"]
 mod handlers;
 
 pub fn play() {
-    let colour = input_handler::ask_for_player_colour();
+    let colour = handlers::ask_for_player_colour();
     let mut map = map::Map::new(map::player::Player::new((0, 0), colour));
 
     if let Err(_) = map.print() {
@@ -17,32 +14,26 @@ pub fn play() {
     }
 
     loop {
-        let cmd = input_handler::ask_form_game_command();
+        match handlers::ask_for_game_command() {
+            handlers::command::GameCmd::Move => loop {
+                let coordinates = handlers::ask_for_coordinates();
 
-        match cmd {
-            input_handler::command::PlayerCmd::Move => loop {
-                let coordinates = input_handler::ask_for_coordinates();
-
-                if map.within_boundries(coordinates) {
-                    println!(
-                        "Out of bounds, given coordinates are out of the map ({}x{})",
-                        map::Map::DEFAULT_WIDTH,
-                        map::Map::DEFAULT_HEIGHT
-                    );
+                if let Err(e) = map.within_boundries(coordinates) {
+                    println!("{}", e);
                     continue;
                 }
 
                 let coord = (coordinates.0.unwrap(), coordinates.1.unwrap());
 
-                if map.is_valid_movement(coord) {
-                    println!("You can only move 4 squares at a time!");
+                if let Err(e) = map.is_valid_movement(coord) {
+                    println!("{}", e);
                     continue;
                 }
 
                 map.move_player(coord);
                 break;
             },
-            input_handler::command::PlayerCmd::Search => {
+            handlers::command::GameCmd::Search => {
                 if !map.search() {
                     println!("Dayum..your search resulted in nothing :/");
                     println!(
@@ -54,9 +45,7 @@ pub fn play() {
                     break;
                 }
             }
-            input_handler::command::PlayerCmd::Quit => break,
-            // if we ever get here that means something teribly wrong happened
-            _ => break,
+            handlers::command::GameCmd::Quit => break,
         }
 
         if let Err(_) = map.print() {

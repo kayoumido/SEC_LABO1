@@ -12,10 +12,15 @@ pub mod player;
 #[path = "../../utils.rs"]
 mod utils;
 
+#[path="../errors.rs"]
+mod errors;
+
 use std::io::{self, Write};
 use termcolor::{BufferWriter, Color, ColorChoice, ColorSpec, WriteColor};
 
 use player::Player;
+
+use errors::MapError;
 
 pub struct Map {
     map: Vec<Vec<char>>,
@@ -152,7 +157,7 @@ impl Map {
     /// # Arguments
     ///
     /// * `dest` - A tuple of u8 containing the destination coordinates
-    pub fn is_valid_movement(&self, dest: (u8, u8)) -> bool {
+    pub fn is_valid_movement(&self, dest: (u8, u8)) -> Result<(), MapError> {
         let src = self.player.get_position();
         // we need to add 1 because the end of the range is still a valid movement
         let x_boundary_end = src.0 + Self::MAX_PLAYER_MOVEMENT + 1;
@@ -175,8 +180,11 @@ impl Map {
             y_boundary_start = src.1 - Self::MAX_PLAYER_MOVEMENT;
         }
 
-        (x_boundary_start..x_boundary_end).contains(&dest.0)
-            && (y_boundary_start..y_boudary_end).contains(&dest.1)
+        if (x_boundary_start..x_boundary_end).contains(&dest.0) && (y_boundary_start..y_boudary_end).contains(&dest.1) {
+            Ok(())
+        } else {
+            Err(MapError::InvalidMovement)
+        }
     }
 
     /// Check that a given coordinate is within the borad boundaries
@@ -186,10 +194,12 @@ impl Map {
     ///
     /// * `coordinate` - A tuple of u8 containing the coordiante to check
     ///
-    pub fn within_boundries(&self, coordinate: (Option<u8>, Option<u8>)) -> bool {
-        (coordinate.0 != None && coordinate.1 != None)
-            && (0..self.map[0].len()).contains(&(coordinate.0.unwrap() as usize))
-            && (0..self.map.len()).contains(&(coordinate.1.unwrap() as usize))
+    pub fn within_boundries(&self, coordinate: (Option<u8>, Option<u8>)) -> Result<(), MapError> {
+        if (coordinate.0 != None && coordinate.1 != None) && (0..self.map[0].len()).contains(&(coordinate.0.unwrap() as usize)) && (0..self.map.len()).contains(&(coordinate.1.unwrap() as usize)) {
+            Ok(())
+        } else {
+            Err(MapError::OutOfBoundsError)
+        }
     }
 
     /// Returns the Euclidean distance between the player and the treasure
