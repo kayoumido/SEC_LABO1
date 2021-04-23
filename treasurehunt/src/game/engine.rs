@@ -4,7 +4,17 @@ pub mod map;
 #[path = "input/handlers.rs"]
 mod handlers;
 
+fn game_menu() {
+    println!();
+    println!("Game Menu");
+    println!("---------");
+    println!("1. Move");
+    println!("2. Search");
+    println!("3. Quit");
+}
+
 pub fn play() {
+    print!("Before you can start your hunt..");
     let colour = handlers::ask_for_player_colour();
     let mut map = map::Map::new(map::player::Player::new((0, 0), colour));
 
@@ -14,6 +24,7 @@ pub fn play() {
     }
 
     loop {
+        game_menu();
         match handlers::ask_for_game_command() {
             handlers::command::GameCmd::Move => loop {
                 let coordinates = handlers::ask_for_coordinates();

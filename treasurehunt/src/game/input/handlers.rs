@@ -1,6 +1,4 @@
-use lazy_static::lazy_static;
 use read_input::prelude::*;
-use regex::Regex;
 use std::str::FromStr;
 use termcolor::Color;
 
@@ -10,10 +8,15 @@ pub mod command;
 #[path = "../../utils.rs"]
 pub mod utils;
 
+#[path = "semantic_check.rs"]
 mod semantic_check;
+
+#[path = "syntatic_check.rs"]
 mod syntatic_check;
 
 use command::{GameCmd, MenuCmd};
+use semantic_check::*;
+use syntatic_check::*;
 
 fn get_input(msg: &str, err_msg: &str, syntatic_test: fn(&str) -> bool) -> String {
     let input: String = input()
@@ -33,10 +36,10 @@ pub fn ask_for_game_command() -> GameCmd {
         let input_cmd = get_input(
             "What do you want to do ? ",
             "Unknown gane command",
-            syntatic_check::check_cmd_syntax,
+            check_cmd_syntax,
         );
 
-        if let Err(e) = semantic_check::check_game_cmd_semantic(&input_cmd) {
+        if let Err(e) = check_game_cmd_semantic(&input_cmd) {
             println!("{}", e);
             continue;
         }
@@ -53,7 +56,7 @@ pub fn ask_for_menu_command() -> MenuCmd {
             syntatic_check::check_cmd_syntax,
         );
 
-        if let Err(e) = semantic_check::check_menu_cmd_semantic(&input_cmd) {
+        if let Err(e) = check_menu_cmd_semantic(&input_cmd) {
             println!("{}", e);
             continue;
         }
@@ -65,13 +68,13 @@ pub fn ask_for_menu_command() -> MenuCmd {
 pub fn ask_for_player_colour() -> Color {
     loop {
         let input_colour = get_input(
-            "What colour would you like? ",
+            "What colour would you like? \n(You can give a colour name or a rgb cod. e.g. Blue or (255, 51, 204) ",
             "Please enter a colour or a rgb code.",
             syntatic_check::check_colour_syntax,
         );
 
         let cleaned_input = clean_input(&input_colour);
-        if let Err(e) = semantic_check::check_colour_semantic(&cleaned_input) {
+        if let Err(e) = check_colour_semantic(&cleaned_input) {
             println!("{}", e);
             continue;
         }
@@ -83,16 +86,16 @@ pub fn ask_for_player_colour() -> Color {
 pub fn ask_for_coordinates() -> (Option<u8>, Option<u8>) {
     loop {
         let input_coord = get_input(
-            "Where do you want to go? ",
+            "Where do you want to go? \n(Enter coordinates (i.e. (x, y) or [x, y]) and max 4 squares) ",
             "Bad format, please respect the format (i.e. (x, y) or [x, y])",
-            syntatic_check::check_coord_syntax,
+            check_coord_syntax,
         );
 
         let clean_coord = clean_input(&input_coord.to_string());
         let coords: Vec<&str> = clean_coord.split(',').collect();
-        if let Err(e) = semantic_check::check_coordinate_semantic(&coords) {
+        if let Err(e) = check_coordinate_semantic(&coords) {
             println!("{}", e);
-            continue; 
+            continue;
         }
 
         return (

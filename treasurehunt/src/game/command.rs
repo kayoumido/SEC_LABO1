@@ -13,8 +13,8 @@ pub enum GameCmd {
 pub enum MenuCmd {
     #[strum(serialize = "Start", serialize = "start", serialize = "1")]
     Start,
-    #[strum(serialize = "Info", serialize = "info", serialize = "2")]
-    Info,
+    #[strum(serialize = "About", serialize = "info", serialize = "2")]
+    About,
     #[strum(serialize = "Quit", serialize = "quit", serialize = "3")]
     Quit,
 }

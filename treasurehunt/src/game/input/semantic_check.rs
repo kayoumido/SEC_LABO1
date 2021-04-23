@@ -1,17 +1,14 @@
-use errors::SemanticError;
 use std::str::FromStr;
 use termcolor::Color;
 
 #[path = "../command.rs"]
 pub mod command;
+
 #[path = "../errors.rs"]
 mod errors;
 
 use command::{GameCmd, MenuCmd};
-
-fn clean_input(input: &String) -> String {
-    input.replace(&['(', ')', '[', ']', ' '][..], "")
-}
+use errors::SemanticError;
 
 pub fn check_game_cmd_semantic(cmd: &str) -> Result<(), SemanticError> {
     if let Err(_) = GameCmd::from_str(&cmd) {
@@ -40,7 +37,7 @@ pub fn check_coordinate_semantic(coord: &Vec<&str>) -> Result<(), SemanticError>
 pub fn check_colour_semantic(colour: &str) -> Result<(), termcolor::ParseColorError> {
     if let Err(e) = Color::from_str(&colour) {
         Err(e)
-    } else{
+    } else {
         Ok(())
     }
 }
