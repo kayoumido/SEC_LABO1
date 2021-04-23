@@ -4,6 +4,7 @@ pub mod map;
 #[path = "input/handlers.rs"]
 mod handlers;
 
+/// Display the Game menu
 fn game_menu() {
     println!();
     println!("Game Menu");
@@ -13,6 +14,7 @@ fn game_menu() {
     println!("3. Quit");
 }
 
+/// Main game loop
 pub fn play() {
     print!("Before you can start your hunt..");
     let colour = handlers::ask_for_player_colour();
@@ -35,7 +37,6 @@ pub fn play() {
                 }
 
                 let coord = (coordinates.0.unwrap(), coordinates.1.unwrap());
-
                 if let Err(e) = map.is_valid_movement(coord) {
                     println!("{}", e);
                     continue;

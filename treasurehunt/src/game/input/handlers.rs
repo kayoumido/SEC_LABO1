@@ -18,6 +18,14 @@ use command::{GameCmd, MenuCmd};
 use semantic_check::*;
 use syntatic_check::*;
 
+/// Main function to ask for user input
+///
+/// # Arguments
+///
+/// * `msg` - question/message to display to the user
+/// * `err_msg` - error message to display when the users input fails the syntax check
+/// * `syntatic_test` - function to perfor the syntax check. signature : fn(&str) -> bool
+///
 fn get_input(msg: &str, err_msg: &str, syntatic_test: fn(&str) -> bool) -> String {
     let input: String = input()
         .repeat_msg(msg)
@@ -31,6 +39,7 @@ fn clean_input(input: &String) -> String {
     input.replace(&['(', ')', '[', ']', ' '][..], "")
 }
 
+/// Ask the player for a menu command
 pub fn ask_for_game_command() -> GameCmd {
     loop {
         let input_cmd = get_input(
@@ -48,6 +57,7 @@ pub fn ask_for_game_command() -> GameCmd {
     }
 }
 
+/// Ask the player for a menu command
 pub fn ask_for_menu_command() -> MenuCmd {
     loop {
         let input_cmd = get_input(
@@ -65,6 +75,7 @@ pub fn ask_for_menu_command() -> MenuCmd {
     }
 }
 
+/// Ask the player for a colour
 pub fn ask_for_player_colour() -> Color {
     loop {
         let input_colour = get_input(
@@ -83,6 +94,7 @@ pub fn ask_for_player_colour() -> Color {
     }
 }
 
+/// Ask the player for coordinates
 pub fn ask_for_coordinates() -> (Option<u8>, Option<u8>) {
     loop {
         let input_coord = get_input(
