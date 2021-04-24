@@ -10,6 +10,13 @@ mod errors;
 use command::{GameCmd, MenuCmd};
 use errors::SemanticError;
 
+/// Check if a given str is a semanticly a valid game command
+/// i.e. GameCmd enum can parse it ^^'
+/// 
+/// # Arguments
+/// 
+/// * `cmd` - the str to check
+/// 
 pub fn check_game_cmd_semantic(cmd: &str) -> Result<(), SemanticError> {
     if let Err(_) = GameCmd::from_str(&cmd) {
         Err(SemanticError::InvalidGameCmdSemantic)
@@ -18,6 +25,13 @@ pub fn check_game_cmd_semantic(cmd: &str) -> Result<(), SemanticError> {
     }
 }
 
+/// Check if a given str is a semanticly a valid menu command
+/// i.e. MenuCmd enum can parse it ^^'
+/// 
+/// # Arguments
+/// 
+/// * `cmd` - the str to check
+/// 
 pub fn check_menu_cmd_semantic(cmd: &str) -> Result<(), SemanticError> {
     if let Err(_) = MenuCmd::from_str(&cmd) {
         Err(SemanticError::InvalidMenuCmdSemantic)
@@ -26,6 +40,13 @@ pub fn check_menu_cmd_semantic(cmd: &str) -> Result<(), SemanticError> {
     }
 }
 
+/// Check if a given str is a semanticly a valid coordinate
+/// i.e. it only has two elements
+/// 
+/// # Arguments
+/// 
+/// * `coord` - the str to check
+/// 
 pub fn check_coordinate_semantic(coord: &Vec<&str>) -> Result<(), SemanticError> {
     if coord.len() != 2 {
         Err(SemanticError::InvalidCoordinateSemantic)
@@ -34,6 +55,13 @@ pub fn check_coordinate_semantic(coord: &Vec<&str>) -> Result<(), SemanticError>
     }
 }
 
+/// Check if a given str is a semanticly a valid colour
+/// i.e. Color enum can parse it ^^'
+/// 
+/// # Arguments
+/// 
+/// * `colour` - the str to check
+/// 
 pub fn check_colour_semantic(colour: &str) -> Result<(), termcolor::ParseColorError> {
     if let Err(e) = Color::from_str(&colour) {
         Err(e)
