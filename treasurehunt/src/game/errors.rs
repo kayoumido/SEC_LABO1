@@ -3,7 +3,7 @@ use std::fmt;
 use strum::EnumMessage;
 use strum_macros;
 
-#[derive(Debug, strum_macros::EnumMessage)]
+#[derive(PartialEq, Debug, strum_macros::EnumMessage)]
 pub enum SemanticError {
     #[strum(message = "Unknown game command, please try again")]
     #[strum(

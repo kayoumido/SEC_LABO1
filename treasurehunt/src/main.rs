@@ -84,9 +84,10 @@ fn main() {
             }
             handlers::command::MenuCmd::About => about(),
             handlers::command::MenuCmd::Quit => {
-                println!("Goodbye!");
                 break;
             }
         }
     }
+
+    println!("Goodbye!");
 }
