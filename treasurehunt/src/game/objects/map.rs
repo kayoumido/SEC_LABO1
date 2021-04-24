@@ -166,7 +166,7 @@ impl Map {
         let src = self.player.get_position();
         // we need to add 1 because the end of the range is still a valid movement
         let x_boundary_end = src.0 + Self::MAX_PLAYER_MOVEMENT + 1;
-        let y_boudary_end = src.0 + Self::MAX_PLAYER_MOVEMENT + 1;
+        let y_boudary_end = src.1 + Self::MAX_PLAYER_MOVEMENT + 1;
 
         let x_boundary_start: u8;
         let y_boundary_start: u8;
