@@ -47,3 +47,36 @@ pub fn parse_number(s: &str) -> Option<u8> {
 pub fn clean_str(s: &str) -> String {
     s.replace(&['(', ')', '[', ']', ' '][..], "")
 }
+
+#[cfg(test)]
+mod test {
+    use super::{clean_str, parse_number};
+    use rstest::rstest;
+
+    #[rstest(
+        input,
+        expected,
+        case("8", Some(8)),
+        case("255", Some(255)),
+        case("0xFF", Some(255)),
+        case("0xA", Some(10)),
+        case("notanumber", None)
+        ::trace
+    )]
+    fn test_parse_number(input: &str, expected: Option<u8>) {
+        assert_eq!(parse_number(input), expected);
+    }
+
+    #[rstest(
+        input,
+        expected,
+        case("Hello World", "HelloWorld"),
+        case("(1, 2, 3)", "1,2,3"),
+        case("[4,5,6]", "4,5,6"),
+        case("nothing", "nothing")
+        ::trace
+    )]
+    fn test_clean_str(input: &str, expected: &str) {
+        assert_eq!(clean_str(input), expected);
+    }
+}
