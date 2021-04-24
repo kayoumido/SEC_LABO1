@@ -1,5 +1,8 @@
-/*! Visual only `Map` functions
-
+/*!
+ * Map strcut containing representation of it and the game rules
+ *
+ * # Author
+ * Doran Kayoumi <doran.kayoumi@heig-vd.ch>
 #
 Add the missing part (`// TODO`).
 

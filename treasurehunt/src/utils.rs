@@ -1,3 +1,10 @@
+/*!
+ * This file contains all the `utility`functions that may be needed in
+ * multiple other functions.
+ *
+ * # Author
+ * Doran Kayoumi <doran.kayoumi@heig-vd.ch>
+ */
 use rand::Rng;
 
 /// Generate coordinates

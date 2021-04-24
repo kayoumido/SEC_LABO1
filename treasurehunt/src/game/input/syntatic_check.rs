@@ -1,3 +1,10 @@
+/*!
+ * Functions to check if the user input is syntactically valid
+ * 
+ * # Author
+ * Doran Kayoumi <doran.kayoumi@heig-vd.ch>
+ */
+
 use regex::Regex;
 
 /// Check if a string is syntactically a correct command

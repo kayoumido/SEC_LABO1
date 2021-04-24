@@ -1,3 +1,20 @@
+/*!
+ * First labratory for the Secure Coding course at the HEIG-VD.
+ *
+ * This project (crate?) is an implementation of a small treasure hunting game.
+ *
+ * The player has to move arround the map and search each square for the treasure
+ *
+ * # Author
+ * Doran Kayoumi <doran.kayoumi@heig-vd.ch>
+ *
+ * # Notes
+ *
+ * For some reason when compiling there's a warning saying that most of the
+ * functions aren't used..but it isn't the case. I think it's linked to how the
+ * different files are imported, but I don't know how to fix it Q_Q.
+ */
+
 #[path = "game/engine.rs"]
 mod engine;
 

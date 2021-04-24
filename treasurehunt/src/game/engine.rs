@@ -1,3 +1,11 @@
+/*!
+ * Main game loop (i.e. the game engine). This is where the user input
+ * is handled.
+ *
+ * # Author
+ * Doran Kayoumi <doran.kayoumi@heig-vd.ch>
+ */
+
 #[path = "objects/map.rs"]
 pub mod map;
 

@@ -1,3 +1,10 @@
+/*!
+ * Functions related to any user interaction
+ *
+ * # Author
+ * Doran Kayoumi <doran.kayoumi@heig-vd.ch>
+ */
+
 use read_input::prelude::*;
 use std::str::FromStr;
 use termcolor::Color;

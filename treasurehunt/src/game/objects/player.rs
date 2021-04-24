@@ -1,3 +1,9 @@
+/*!
+ * Struct to contain the player information (i.e. current position and colour)
+ *
+ * # Author
+ * Doran Kayoumi <doran.kayoumi@heig-vd.ch>
+ */
 use termcolor::Color;
 #[derive(Debug, Copy, Clone)]
 pub struct Player {

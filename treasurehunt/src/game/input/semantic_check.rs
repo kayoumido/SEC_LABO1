@@ -1,3 +1,10 @@
+/*!
+ * Functions to check if the user input is semanticly valid
+ * 
+ * # Author
+ * Doran Kayoumi <doran.kayoumi@heig-vd.ch>
+ */
+
 use std::str::FromStr;
 use termcolor::Color;
 

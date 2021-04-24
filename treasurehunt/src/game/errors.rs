@@ -1,3 +1,14 @@
+/*!
+ * Here lays the definition of all the custom errors used in the game
+ *
+ * # Note
+ * To simplify the definition of messages n' stuff, the crates `strum` & `strum_macros`
+ * were used (thank you SEC Midterm :D)
+ *
+ * # Author
+ * Doran Kayoumi <doran.kayoumi@heig-vd.ch>
+ */
+
 use std::error;
 use std::fmt;
 use strum::EnumMessage;
