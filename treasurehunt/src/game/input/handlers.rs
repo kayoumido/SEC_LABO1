@@ -35,10 +35,6 @@ fn get_input(msg: &str, err_msg: &str, syntatic_test: fn(&str) -> bool) -> Strin
     return input;
 }
 
-fn clean_input(input: &String) -> String {
-    input.replace(&['(', ')', '[', ']', ' '][..], "")
-}
-
 /// Ask the player for a menu command
 pub fn ask_for_game_command() -> GameCmd {
     loop {
@@ -84,7 +80,7 @@ pub fn ask_for_player_colour() -> Color {
             syntatic_check::check_colour_syntax,
         );
 
-        let cleaned_input = clean_input(&input_colour);
+        let cleaned_input = utils::clean_str(&input_colour);
         if let Err(e) = check_colour_semantic(&cleaned_input) {
             println!("{}", e);
             continue;
@@ -103,7 +99,7 @@ pub fn ask_for_coordinates() -> (Option<u8>, Option<u8>) {
             check_coord_syntax,
         );
 
-        let clean_coord = clean_input(&input_coord.to_string());
+        let clean_coord = utils::clean_str(&input_coord.to_string());
         let coords: Vec<&str> = clean_coord.split(',').collect();
         if let Err(e) = check_coordinate_semantic(&coords) {
             println!("{}", e);
